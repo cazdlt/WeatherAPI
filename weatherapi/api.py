@@ -1,13 +1,26 @@
+from flask import Blueprint, current_app
 from flask_restful import Api, Resource
-from flask import Blueprint
+import requests
 
 bp = Blueprint("api", __name__)
 api = Api(bp)
 
 
 def get_weather(city: str, country_code: str) -> dict:
-    # todo request data from openweather api
-    pass
+
+    url = "https://api.openweathermap.org/data/2.5/weather"
+
+    apikey = current_app.config["OPEN_WEATHER_API_KEY"]
+    remove_diacritics = lambda str: str.translate(
+        str.maketrans(
+            "áàäéèëíìïòóöùúüÀÁÄÈÉËÌÍÏÒÓÖÙÚÜ", "aaaeeeiiiooouuuAAAEEEIIIOOOUUU"
+        )
+    )
+
+    params = {"q": f"{remove_diacritics(city)},{country_code}", "appid": apikey}
+    response = requests.get(url, params=params)
+
+    return response.json()
 
 
 class Weather(Resource):
