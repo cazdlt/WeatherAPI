@@ -1,2 +1,4 @@
-/.flaskenv
-/.vscode
+.flaskenv
+.vscode
+cfg.py
+**__pycache__
