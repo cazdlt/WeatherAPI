@@ -19,7 +19,7 @@ def parse_weather_xml(xml: bytes) -> dict:
 
     wind_speed = weather["wind"]["speed"].attrib
     wind_dir = weather["wind"]["direction"].attrib
-    wind = f"{wind_speed['name']}, {wind_speed['value']} {wind_speed['unit']}, {wind_dir['name']}"
+    wind = f"{wind_speed['name']}, {wind_speed['value']} {wind_speed['unit']}, {wind_dir.get('name','')}"
 
     # bad spelling but its the requirement
     cloudines = weather["clouds"].attrib["name"].capitalize()
@@ -39,7 +39,7 @@ def parse_weather_xml(xml: bytes) -> dict:
     sunset = datetime.datetime.strptime(sun["set"], date_format) + timezone_delta
 
     coords = weather["city"]["coord"].attrib
-    geo_coordinates = f"[{coords['lat']} {coords['lon']}]"
+    geo_coordinates = f"[{coords['lat']}, {coords['lon']}]"
 
     requested_time = datetime.datetime.now()
 
@@ -95,34 +95,25 @@ def get_weather(city: str, country_code: str) -> dict:
 
 class Weather(Resource):
     def get(self):
-        #TODO
-        pass
-        # # query params
-        # city = request.args.get("city")
-        # country = request.args.get("city")
+        # query params
+        city = request.args.get("city")
+        country = request.args.get("country")
 
-        # if city is None or country is None:
-        #     #todo return correct http error
-        #     return {},404
+        if not city or not country:
+            error = {
+                "error": {
+                    "code": 400,
+                    "message": "Both city and country must be specified",
+                }
+            }
+            return error, 400
 
-        # weather=get_weather(city,country)
+        weather = get_weather(city, country)
 
-        # if weather["cod"]=="404":
-        #     #todo return correct http error
-        #     return {},404
+        if "error" in weather:
+            return weather, weather["error"]["code"]
 
-        # response={
-        #     "location_name":f"{city}, {country}",
-        #     "temperature": f"{weather['main']} °C"
-        #     "wind":,
-        #     "cloudines":, #bad spelling but following the requirement
-        #     "presure":, #bad spelling but following the requirement
-        #     "humidity":,
-        #     "sunrise":,
-        #     "sunset":,
-        #     "geo_coordinates":,
-        #     "requested_time":,
-        # }
+        return weather, 200
 
 
 api.add_resource(Weather, "/weather")
