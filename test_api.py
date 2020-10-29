@@ -20,21 +20,37 @@ def client(app):
 def test_openweather(app):
     # Test the OpenWeather API
 
-    # ok
+    # normal
     weather = get_weather("Bogota", "CO")
-    assert weather["coord"]["lat"] == 4.61
-    assert weather["coord"]["lon"] == -74.08
-    assert weather["name"] == "Bogotá"
+    assert "location_name" in weather
+    assert "temperature" in weather
+    assert "wind" in weather
+    assert "cloudines" in weather
+    assert "presure" in weather
+    assert "humidity" in weather
+    assert "sunrise" in weather
+    assert "sunset" in weather
+    assert "geo_coordinates" in weather
+    assert "requested_time" in weather
 
-    # con tilde
+    # with accent
     weather = get_weather("Bogotá", "CO")
-    assert weather["coord"]["lat"] == 4.61
-    assert weather["coord"]["lon"] == -74.08
-    assert weather["name"] == "Bogotá"
+    assert "location_name" in weather
+    assert "temperature" in weather
+    assert "wind" in weather
+    assert "cloudines" in weather
+    assert "presure" in weather
+    assert "humidity" in weather
+    assert "sunrise" in weather
+    assert "sunset" in weather
+    assert "geo_coordinates" in weather
+    assert "requested_time" in weather
 
-    # ciudad no existe
+    # city does not exist
     weather = get_weather("Bogotá", "FR")
-    assert weather["message"] == "city not found"
+    assert "error" in weather
+    assert weather["error"]["code"] == 404
+    assert weather["error"]["message"] == "city not found"
 
 
 def test_api():

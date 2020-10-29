@@ -21,7 +21,7 @@ GET /weather?city=$City&country=$Country&
     "location_name": "Bogota, CO",
     "temperature": "17 °C",
     "wind": "Gentle breeze, 3.6 m/s, west-northwest",
-    "cloudines": "Scattered clouds",
+    "cloudines": "Scattered clouds", 
     "presure": "1027 hpa",
     "humidity": "63%",
     "sunrise": "06:07",

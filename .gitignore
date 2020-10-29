@@ -1,4 +1,6 @@
 .flaskenv
-.vscode
+.vscode/
 cfg.py
-**__pycache__
+**__pycache__/
+example.xml
+.pytest_cache/
