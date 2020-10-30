@@ -1,14 +1,34 @@
 import datetime
 
 import requests
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, json, request
 from flask_restful import Api, Resource
 from lxml import objectify
+from werkzeug.exceptions import HTTPException
 
 from . import cache
 
 bp = Blueprint("api", __name__)
 api = Api(bp)
+
+
+@bp.app_errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+
+    response = e.get_response()
+
+    response.data = json.dumps(
+        {
+            "error": {
+                "code": e.code,
+                "name": e.name,
+                "message": e.description,
+            }
+        }
+    )
+    response.content_type = "application/json"
+    return response
 
 
 def parse_weather_xml(xml: bytes) -> dict:
