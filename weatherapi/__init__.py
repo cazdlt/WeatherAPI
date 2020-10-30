@@ -1,5 +1,8 @@
 from flask import Flask
+from flask_caching import Cache
 import cfg
+
+cache = Cache()
 
 
 def create_app(dev=False) -> Flask:
@@ -10,6 +13,8 @@ def create_app(dev=False) -> Flask:
         app.config.from_object(cfg.DevConfig)
     else:
         app.config.from_object(cfg.Config)
+
+    cache.init_app(app)
 
     from .api import bp as api
 

@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from weatherapi import create_app
@@ -74,8 +76,10 @@ def test_api(client, city, country):
         "city": city,
         "country": country,
     }
-    weather = client.get(url, query_string=params).json
+    response = client.get(url, query_string=params)
+    weather = response.json
 
+    assert response.headers["Content-Type"] == "application/json"
     assert "location_name" in weather
     assert "temperature" in weather
     assert "wind" in weather
@@ -106,12 +110,22 @@ def test_api_bad_input(client, city, country, error_code):
         "city": city,
         "country": country,
     }
-    weather = client.get(url, query_string=params).json
+    response = client.get(url, query_string=params)
+    weather = response.json
 
+    assert response.headers["Content-Type"] == "application/json"
     assert "error" in weather
     assert error_code == weather["error"]["code"]
 
 
-def test_cache():
-    # todo test two hour caching (can be done?)
-    pass
+def test_cache(client):
+    # tested manually
+
+    url = "/weather"
+    params = {
+        "city": "Cali",
+        "country": "co",
+    }
+    time.sleep(120)
+    response = client.get(url, query_string=params)
+    response2 = client.get(url, query_string=params)

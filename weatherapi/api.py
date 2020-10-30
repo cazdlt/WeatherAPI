@@ -5,11 +5,22 @@ from flask import Blueprint, current_app, request
 from flask_restful import Api, Resource
 from lxml import objectify
 
+from . import cache
+
 bp = Blueprint("api", __name__)
 api = Api(bp)
 
 
 def parse_weather_xml(xml: bytes) -> dict:
+    """
+    Formats OWM XML response
+
+    Args:
+        xml (bytes): OpenWeatherMap current weather XML response.
+
+    Returns:
+        dict: Organized weather data.
+    """
 
     weather = objectify.fromstring(xml)
 
@@ -60,6 +71,16 @@ def parse_weather_xml(xml: bytes) -> dict:
 
 
 def get_weather(city: str, country_code: str) -> dict:
+    """
+    Gets weather data from OpenWeatherMap's API and formats it.
+
+    Args:
+        city (str): City name (eg. Bogotá)
+        country_code (str): Country code (eg. CO)
+
+    Returns:
+        dict: Current weather data for the specified city, or error message.
+    """
 
     url = "https://api.openweathermap.org/data/2.5/weather"
 
@@ -94,6 +115,7 @@ def get_weather(city: str, country_code: str) -> dict:
 
 
 class Weather(Resource):
+    @cache.cached(timeout=120, query_string=True)
     def get(self):
         # query params
         city = request.args.get("city")
